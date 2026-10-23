@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra #{{ $compra->id_compra }} - {{ $empresa->razon_social }}</title>
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+    <style>
+        body{background:#f8fafc;color:#1e293b;padding:25px 15px;font-family:Arial,sans-serif}.documento{max-width:820px;margin:auto;background:#fff;padding:35px;border:1px solid #e2e8f0;border-radius:12px}.titulo{font-weight:800;color:#0f172a}.sello{background:#0f172a;color:#fff;padding:7px 14px;border-radius:6px;font-weight:700;display:inline-block}.table thead th{background:#f1f5f9;text-transform:uppercase;font-size:.78rem}@media print{body{background:#fff;padding:0}.no-print{display:none!important}.documento{border:0;box-shadow:none;padding:5px;max-width:100%}}
+    </style>
+</head>
+<body><main class="documento">
+    <div class="d-flex justify-content-between border-bottom pb-3 mb-4 no-print"><a href="{{ route('compras') }}" class="btn btn-outline-secondary btn-sm">Volver a compras</a><button onclick="window.print()" class="btn btn-primary btn-sm">Imprimir factura</button></div>
+    <div class="row align-items-center mb-4"><div class="col-sm-7"><h3 class="titulo mb-1">{{ $empresa->razon_social }}</h3><p class="small text-muted mb-0">{{ $empresa->direccion }} · {{ $empresa->ciudad }}</p><p class="small text-muted mb-0">NIT: {{ $empresa->nit }} · {{ $empresa->telefono }}</p></div><div class="col-sm-5 text-sm-end mt-3 mt-sm-0"><span class="sello">FACTURA DE COMPRA</span><h4 class="fw-bold mb-0 mt-2">N° {{ str_pad($compra->id_compra, 6, '0', STR_PAD_LEFT) }}</h4><small class="text-muted">{{ date('d/m/Y H:i', strtotime($compra->fecha)) }}</small></div></div>
+    <div class="bg-light rounded p-3 mb-4"><div class="row small"><div class="col-sm-6"><strong class="text-muted d-block">Proveedor</strong>{{ $compra->proveedor->nombre_empresa ?? 'Sin proveedor' }}<br><span class="text-muted">{{ $compra->proveedor->telefono ?? '' }}</span></div><div class="col-sm-6"><strong class="text-muted d-block">Comprobante interno</strong>{{ $compra->nro_comprobante }}<br><strong class="text-muted">Registrado por:</strong> {{ $compra->usuario->nombre ?? 'Sistema' }}</div></div></div>
+    <table class="table table-bordered align-middle"><thead><tr><th class="text-center">#</th><th>Producto</th><th class="text-center">Cantidad</th><th class="text-end">Costo unit.</th><th class="text-end">Subtotal</th></tr></thead><tbody>@foreach($compra->detalles as $indice => $detalle)<tr><td class="text-center">{{ $indice + 1 }}</td><td><strong>{{ $detalle->producto->nombre ?? 'Producto #' . $detalle->id_producto }}</strong><br><small class="text-muted">{{ $detalle->producto->marca ?? '' }}</small></td><td class="text-center">{{ $detalle->cantidad }}</td><td class="text-end">Bs. {{ number_format($detalle->precio_compra, 2) }}</td><td class="text-end">Bs. {{ number_format($detalle->cantidad * $detalle->precio_compra, 2) }}</td></tr>@endforeach</tbody><tfoot><tr class="table-light"><th colspan="4" class="text-end">TOTAL COMPRA</th><th class="text-end text-primary">Bs. {{ number_format($compra->detalles->sum(fn($d) => $d->cantidad * $d->precio_compra), 2) }}</th></tr></tfoot></table>
+    <p class="text-center small text-muted border-top pt-3 mb-0">Documento emitido por el Sistema Comercial PEBIE · Oruro, Bolivia</p>
+</main></body></html>
